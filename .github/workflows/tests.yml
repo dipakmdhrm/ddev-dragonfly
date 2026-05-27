@@ -19,6 +19,7 @@ concurrency:
 
 jobs:
   test:
+    name: test (DDEV ${{ matrix.ddev_version }}, ${{ matrix.bats_tag }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
