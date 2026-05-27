@@ -1,0 +1,33 @@
+name: dragonfly
+
+pre_install_actions: []
+
+project_files:
+  - docker-compose.dragonfly.yaml
+  - dragonfly/scripts/settings.ddev.dragonfly.php
+  - dragonfly/scripts/setup-drupal-settings.sh
+  - commands/dragonfly/redis-cli
+  - commands/dragonfly/dragonfly-flush
+
+global_files: []
+
+post_install_actions:
+  - |
+    #ddev-description:Install DragonflyDB settings for Drupal 9+ if applicable
+    bash dragonfly/scripts/setup-drupal-settings.sh
+
+removal_actions:
+  - |
+    #ddev-description:Remove dragonfly settings if applicable
+    files=(
+      "${DDEV_APPROOT}/${DDEV_DOCROOT}/sites/default/settings.ddev.dragonfly.php"
+    )
+    for file in "${files[@]}"; do
+      if [ -f "$file" ]; then
+        if grep -q '#ddev-generated' "$file"; then
+          rm -f "$file"
+        else
+          echo "Unwilling to remove '$file' because it does not have #ddev-generated in it; you can manually delete it if it is safe to delete."
+        fi
+      fi
+    done

@@ -1,0 +1,32 @@
+#ddev-generated
+services:
+  dragonfly:
+    container_name: ddev-${DDEV_SITENAME}-dragonfly
+    image: ${DRAGONFLY_DOCKER_IMAGE:-docker.dragonflydb.io/dragonflydb/dragonfly:v1.38.1}
+    hostname: ${DRAGONFLY_HOSTNAME:-dragonfly}
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: ${DDEV_APPROOT}
+    restart: "no"
+    expose:
+      - 6379
+    volumes:
+      - ".:/mnt/ddev_config"
+      - "ddev-global-cache:/mnt/ddev-global-cache"
+      - "dragonfly:/data"
+    command: dragonfly --port=6379 --maxmemory=512mb --cache_mode=true --proactor_threads=2
+    ulimits:
+      memlock: -1
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "6379", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    x-ddev:
+      describe-url-port: |
+        Backend: ${DRAGONFLY_DOCKER_IMAGE:-docker.dragonflydb.io/dragonflydb/dragonfly:v1.38.1}
+      describe-info: |
+        Pass: <none>
+
+volumes:
+  dragonfly:

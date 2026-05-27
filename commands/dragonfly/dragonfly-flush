@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+#ddev-generated
+## Description: Flush all keys inside the DragonflyDB container
+## Usage: dragonfly-flush
+## Example: "ddev dragonfly-flush"
+
+redis-cli -p 6379 -h "${DRAGONFLY_HOSTNAME:-dragonfly}" FLUSHALL ASYNC
