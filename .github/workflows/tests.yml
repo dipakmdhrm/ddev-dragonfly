@@ -6,12 +6,6 @@ on:
       - main
   pull_request:
   workflow_dispatch:
-    inputs:
-      debug_enabled:
-        type: boolean
-        description: "Debug with tmate"
-        required: false
-        default: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,19 +13,17 @@ concurrency:
 
 jobs:
   test:
-    name: test (DDEV ${{ matrix.ddev_version }}, ${{ matrix.bats_tag }})
+    name: test (${{ matrix.test }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ddev_version: [stable, HEAD]
-        bats_tag: [generic, drupal10, drupal11]
+        test: [generic, drupal10, drupal11]
       fail-fast: false
     steps:
-      - uses: ddev/github-action-add-on-test@v2
-        with:
-          ddev_version: ${{ matrix.ddev_version }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          debug_enabled: ${{ github.event.inputs.debug_enabled }}
-          addon_repository: ${{ env.GITHUB_REPOSITORY }}
-          addon_ref: ${{ env.GITHUB_REF }}
-          test_command: bats tests --filter-tags ${{ matrix.bats_tag }}
+      - uses: actions/checkout@v4
+
+      - name: Install DDEV
+        run: curl -fsSL https://ddev.com/install.sh | bash
+
+      - name: Run tests
+        run: bash tests/test.sh ${{ matrix.test }}
